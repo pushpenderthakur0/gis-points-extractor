@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GIS Points Extractor - Advanced Geospatial Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --primary-color: #2563eb;
+        --secondary-color: #64748b;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      
+      * {
+        font-family: 'Inter', sans-serif;
+      }
+      
+      body {
+        background: var(--bg-gradient);
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+      
+      .main-container {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      
+      .header-section {
+        background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+        color: white;
+        padding: 2.5rem;
+        border-radius: 20px 20px 0 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .header-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+        opacity: 0.1;
+      }
+      
+      .header-content {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      
+      .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 300;
+      }
+      
+      .form-section {
+        padding: 2.5rem;
+      }
+      
+      .section-divider {
+        display: flex;
+        align-items: center;
+        margin: 2rem 0 1.5rem 0;
+      }
+      
+      .section-divider::before,
+      .section-divider::after {
+        content: '';
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+      }
+      
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin: 0 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .form-card {
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+      }
+      
+      .form-card:hover {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      
+      .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+      }
+      
+      .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+      
+      .help-text {
+        font-size: 0.85rem;
+        color: var(--secondary-color);
+        margin-top: 0.5rem;
+        padding: 0.75rem;
+        background: #f1f5f9;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color);
+      }
+      
+      .help-text strong {
+        color: var(--primary-color);
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+        border: none;
+        border-radius: 12px;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+      }
+      
+      .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+        border-left: 4px solid var(--warning-color);
+      }
+      
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      
+      .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .feature-card:hover {
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+      
+      .feature-card.active {
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      }
+      
+      .feature-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(37, 99, 235, 0.05);
+        border-radius: 8px;
+        text-align: left;
+        animation: fadeInUp 0.3s ease;
+      }
+      
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+      }
+      
+      .feature-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+      
+      .feature-desc {
+        font-size: 0.9rem;
+        color: var(--secondary-color);
+      }
+      
+      .checkbox-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+      }
+      
+      .checkbox-card:hover {
+        border-color: var(--primary-color);
+      }
+      
+      .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+      
+      @media (max-width: 768px) {
+        .main-title {
+          font-size: 2rem;
+        }
+        
+        .form-section {
+          padding: 1.5rem;
+        }
+        
+        .header-section {
+          padding: 2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+          <div class="header-content">
+            <h1 class="main-title">
+              <i class="fas fa-map-marker-alt"></i>
+              GIS Points Extractor
+            </h1>
+            <p class="subtitle">
+              Advanced Geospatial Analysis • Extract Points within Polygon Boundaries
+            </p>
+          </div>
+        </div>
+
+        <!-- Main Form Section -->
+        <div class="form-section">
+          <!-- Alert Messages -->
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {{ messages[0] }}
+              </div>
+            {% endif %}
+          {% endwith %}
+
+          <form method="post" action="{{ url_for('run_tool') }}" enctype="multipart/form-data">
+            
+            <!-- Points Layer Section -->
+            <div class="section-divider">
+              <h5 class="section-title">
+                <i class="fas fa-dot-circle"></i>
+                Points Layer Configuration
+              </h5>
+            </div>
+            
+            <div class="form-card">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">
+                    <i class="fas fa-upload"></i>
+                    Upload Points File
+                  </label>
+                  <input class="form-control" type="file" name="points_file" required accept=".gpkg,.geojson,.json,.zip" />
+                  <div class="help-text">
+                    <strong>Supported formats:</strong> .gpkg (recommended), .geojson/.json, .zip (Shapefile)<br>
+                    <strong>ZIP requirements:</strong> Must contain .shp, .shx, .dbf files
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">
+                    <i class="fas fa-layer-group"></i>
+                    Layer Name (Optional)
+                  </label>
+                  <input class="form-control" type="text" name="points_layer" placeholder="e.g., points, facilities" />
+                  <div class="help-text">
+                    For multi-layer files like GeoPackage
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Polygons Layer Section -->
+            <div class="section-divider">
+              <h5 class="section-title">
+                <i class="fas fa-draw-polygon"></i>
+                Polygon Layer Configuration
+              </h5>
+            </div>
+            
+            <div class="form-card">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <label class="form-label">
+                    <i class="fas fa-upload"></i>
+                    Upload Polygons File
+                  </label>
+                  <input class="form-control" type="file" name="polygons_file" required accept=".gpkg,.geojson,.json,.zip" />
+                  <div class="help-text">
+                    <strong>Examples:</strong> Administrative boundaries, districts, custom areas<br>
+                    <strong>ZIP requirements:</strong> Must contain .shp, .shx, .dbf files
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">
+                    <i class="fas fa-layer-group"></i>
+                    Layer Name (Optional)
+                  </label>
+                  <input class="form-control" type="text" name="polygons_layer" placeholder="e.g., districts, boundaries" />
+                  <div class="help-text">
+                    For multi-layer files like GeoPackage
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selection Criteria Section -->
+            <div class="section-divider">
+              <h5 class="section-title">
+                <i class="fas fa-filter"></i>
+                Selection Criteria
+              </h5>
+            </div>
+            
+            <div class="form-card">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-tag"></i>
+                    Name Column (in polygons)
+                  </label>
+                  <input class="form-control" type="text" name="name_column" placeholder="e.g., NAME, district, ADMIN_NAME" required />
+                  <div class="help-text">
+                    <strong>Common examples:</strong> NAME, district, DISTRICT_NAME, ADMIN_NAME
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-search"></i>
+                    Name Value
+                  </label>
+                  <input class="form-control" type="text" name="name_value" placeholder="e.g., bankura, kolkata, mumbai" required />
+                  <div class="help-text">
+                    <strong>Example:</strong> Enter the specific area name you want to analyze
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Advanced Options Section -->
+            <div class="section-divider">
+              <h5 class="section-title">
+                <i class="fas fa-cogs"></i>
+                Advanced Options
+              </h5>
+            </div>
+            
+            <div class="form-card">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">
+                    <i class="fas fa-location-arrow"></i>
+                    Spatial Relationship
+                  </label>
+                  <select class="form-select" name="predicate">
+                    <option value="within" selected>Within (points completely inside)</option>
+                    <option value="intersects">Intersects (points touching or overlapping)</option>
+                  </select>
+                  <div class="help-text">
+                    <strong>Within:</strong> Stricter - only points completely inside<br>
+                    <strong>Intersects:</strong> Includes points on boundaries
+                  </div>
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                  <div class="checkbox-card w-100">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" name="case_sensitive" id="caseSensitive">
+                      <label class="form-check-label" for="caseSensitive">
+                        <i class="fas fa-font"></i>
+                        Case-sensitive name matching
+                      </label>
+                    </div>
+                    <div class="help-text mt-2">
+                      Enable for exact case matching ("Bankura" ≠ "bankura")
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center mt-4">
+              <button class="btn btn-primary btn-lg" type="submit">
+                <i class="fas fa-rocket me-2"></i>
+                Process Data & Download CSV
+              </button>
+            </div>
+          </form>
+
+          <!-- Features Section -->
+          <div class="feature-grid">
+            <div class="feature-card" onclick="showFeatureDetails('formats')" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to see supported file formats">
+              <div class="feature-icon">
+                <i class="fas fa-map"></i>
+              </div>
+              <div class="feature-title">Multi-Format Support</div>
+              <div class="feature-desc">Supports GeoPackage, GeoJSON, and Shapefiles</div>
+              <div class="feature-details" id="formats-details" style="display: none;">
+                <small>
+                  <strong>✓ GeoPackage (.gpkg)</strong> - Recommended<br>
+                  <strong>✓ GeoJSON (.geojson/.json)</strong> - Web standard<br>
+                  <strong>✓ Shapefile (.zip)</strong> - Traditional GIS format
+                </small>
+              </div>
+            </div>
+            <div class="feature-card" onclick="showFeatureDetails('performance')" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to see performance details">
+              <div class="feature-icon">
+                <i class="fas fa-lightning-bolt"></i>
+              </div>
+              <div class="feature-title">Fast Processing</div>
+              <div class="feature-desc">Optimized spatial analysis algorithms</div>
+              <div class="feature-details" id="performance-details" style="display: none;">
+                <small>
+                  <strong>✓ GeoPandas</strong> - Efficient spatial operations<br>
+                  <strong>✓ Shapely</strong> - Fast geometric calculations<br>
+                  <strong>✓ Multi-threading</strong> - Parallel processing
+                </small>
+              </div>
+            </div>
+            <div class="feature-card" onclick="showFeatureDetails('export')" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to see export options">
+              <div class="feature-icon">
+                <i class="fas fa-download"></i>
+              </div>
+              <div class="feature-title">CSV Export</div>
+              <div class="feature-desc">Ready for Excel, R, Python analysis</div>
+              <div class="feature-details" id="export-details" style="display: none;">
+                <small>
+                  <strong>✓ Excel compatible</strong> - Open directly in spreadsheets<br>
+                  <strong>✓ R/Python ready</strong> - Import with pandas/data.table<br>
+                  <strong>✓ UTF-8 encoding</strong> - International character support<br>
+                  <strong>✓ Automatic download</strong> - CSV downloads after processing
+                </small>
+              </div>
+            </div>
+            <div class="feature-card" onclick="showFeatureDetails('security')" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to see security features">
+              <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="feature-title">Secure Processing</div>
+              <div class="feature-desc">Your data is processed locally and securely</div>
+              <div class="feature-details" id="security-details" style="display: none;">
+                <small>
+                  <strong>✓ Local processing</strong> - No data sent to external servers<br>
+                  <strong>✓ Temporary storage</strong> - Files deleted after processing<br>
+                  <strong>✓ No tracking</strong> - Your privacy is protected
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Initialize Bootstrap tooltips
+      document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      });
+      
+      // Feature card interaction
+      function showFeatureDetails(featureId) {
+        // Hide all details first
+        document.querySelectorAll('.feature-details').forEach(detail => {
+          detail.style.display = 'none';
+        });
+        
+        // Remove active class from all cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+          card.classList.remove('active');
+        });
+        
+        // Show clicked feature details
+        const details = document.getElementById(featureId + '-details');
+        const card = details.closest('.feature-card');
+        
+        if (details.style.display === 'none' || details.style.display === '') {
+          details.style.display = 'block';
+          card.classList.add('active');
+          
+          // Add a nice notification
+          showNotification(`${featureId.charAt(0).toUpperCase() + featureId.slice(1)} details expanded!`, 'info');
+        }
+      }
+      
+      // Show notification
+      function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'info' ? 'primary' : type} position-fixed`;
+        notification.style.cssText = `
+          top: 20px;
+          right: 20px;
+          z-index: 9999;
+          min-width: 300px;
+          opacity: 0;
+          transform: translateX(100%);
+          transition: all 0.3s ease;
+        `;
+        notification.innerHTML = `
+          <i class="fas fa-info-circle me-2"></i>
+          ${message}
+          <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Animate in
+        setTimeout(() => {
+          notification.style.opacity = '1';
+          notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+          notification.style.opacity = '0';
+          notification.style.transform = 'translateX(100%)';
+          setTimeout(() => notification.remove(), 300);
+        }, 3000);
+      }
+      
+      // File upload validation and preview
+      document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function(e) {
+          const file = e.target.files[0];
+          if (file) {
+            const validExtensions = ['.gpkg', '.geojson', '.json', '.zip'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!validExtensions.includes(fileExtension)) {
+              showNotification('Please select a valid file format: .gpkg, .geojson, .json, or .zip', 'warning');
+              e.target.value = '';
+              return;
+            }
+            
+            // Show file info
+            const helpText = e.target.parentNode.querySelector('.help-text');
+            if (helpText) {
+              const fileInfo = `<br><strong>Selected:</strong> ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+              if (!helpText.innerHTML.includes('Selected:')) {
+                helpText.innerHTML += fileInfo;
+              } else {
+                helpText.innerHTML = helpText.innerHTML.replace(/(<br><strong>Selected:<\/strong>.*)/g, fileInfo);
+              }
+            }
+            
+            showNotification(`File "${file.name}" selected successfully!`, 'info');
+          }
+        });
+      });
+      
+      // Form submission loading state
+      document.querySelector('form').addEventListener('submit', function(e) {
+        const button = document.querySelector('button[type="submit"]');
+        const formData = new FormData(this);
+        
+        // Validate files are selected
+        if (!formData.get('points_file').name || !formData.get('polygons_file').name) {
+          e.preventDefault();
+          showNotification('Please select both points and polygons files!', 'warning');
+          return;
+        }
+        
+        // Validate required fields
+        if (!formData.get('name_column') || !formData.get('name_value')) {
+          e.preventDefault();
+          showNotification('Please fill in both Name Column and Name Value fields!', 'warning');
+          return;
+        }
+        
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        button.disabled = true;
+        
+        showNotification('Processing your geospatial data... Please wait!', 'info');
+        
+        // Reset button state after 30 seconds as failsafe
+        setTimeout(() => {
+          button.innerHTML = originalText;
+          button.disabled = false;
+        }, 30000);
+        
+        // Also reset if page becomes visible again (user switched tabs)
+        document.addEventListener('visibilitychange', function() {
+          if (!document.hidden) {
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.disabled = false;
+            }, 2000);
+          }
+        });
+      });
+      
+      // Add some interactive animations on page load
+      window.addEventListener('load', function() {
+        // Animate feature cards in
+        const cards = document.querySelectorAll('.feature-card');
+        cards.forEach((card, index) => {
+          setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+              card.style.opacity = '1';
+              card.style.transform = 'translateY(0)';
+            }, 50);
+          }, index * 100);
+        });
+      });
+    </script>
+  </body>
+</html>
