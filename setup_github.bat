@@ -1,154 +1,65 @@
 @echo off
 echo ========================================
-echo   GitHub Setup Script for GIS Project
+echo    GIS Points Extractor - GitHub Setup
 echo ========================================
 echo.
 
-echo [Step 1] Checking if Git is installed...
-git --version >nul 2>&1
+echo Step 1: Initializing Git repository...
+git init
 if %errorlevel% neq 0 (
-    echo ❌ Git is not installed!
-    echo.
-    echo Please download and install Git from: https://git-scm.com/download/win
-    echo After installation, run this script again.
+    echo Error: Git is not installed or not in PATH
+    echo Please install Git from https://git-scm.com/
     pause
     exit /b 1
-) else (
-    echo ✅ Git is installed
-    git --version
 )
 
 echo.
-echo [Step 2] Git Configuration
-echo Please enter your details:
-echo.
-
-set /p USER_NAME="Enter your full name (e.g., John Doe): "
-set /p USER_EMAIL="Enter your email (e.g., john@gmail.com): "
-
-echo.
-echo Configuring Git with your details...
-git config --global user.name "%USER_NAME%"
-git config --global user.email "%USER_EMAIL%"
-
-echo ✅ Git configured successfully!
-echo   Name: %USER_NAME%
-echo   Email: %USER_EMAIL%
-
-echo.
-echo [Step 3] GitHub Repository Information
-echo.
-echo Before proceeding, please:
-echo 1. Go to https://github.com
-echo 2. Click "New repository" (green button)
-echo 3. Repository name: gis-points-extractor (or your choice)
-echo 4. Description: Modern web application for geospatial analysis
-echo 5. Make it PUBLIC
-echo 6. DON'T initialize with README, .gitignore, or license
-echo 7. Click "Create repository"
-echo.
-
-set /p GITHUB_USERNAME="Enter your GitHub username: "
-set /p REPO_NAME="Enter repository name (default: gis-points-extractor): "
-
-if "%REPO_NAME%"=="" set REPO_NAME=gis-points-extractor
-
-echo.
-echo [Step 4] Initializing Git Repository...
-
-rem Check if already a git repo
-if exist ".git" (
-    echo ⚠️ Git repository already exists. Skipping git init...
-) else (
-    git init
-    echo ✅ Git repository initialized
-)
-
-echo.
-echo [Step 5] Adding files to Git...
+echo Step 2: Adding files to Git...
 git add .
 if %errorlevel% neq 0 (
-    echo ❌ Error adding files to git
+    echo Error: Failed to add files to Git
     pause
     exit /b 1
 )
-echo ✅ Files added to staging area
 
 echo.
-echo [Step 6] Creating initial commit...
-git commit -m "Initial commit: GIS Points Extractor web application
-
-- Modern Flask web interface for geospatial analysis
-- Point-in-polygon extraction functionality  
-- Multi-format support (GeoPackage, GeoJSON, Shapefile)
-- Responsive design with Bootstrap 5
-- ArcGIS Python toolbox included
-- Comprehensive documentation"
-
+echo Step 3: Making initial commit...
+git commit -m "Initial commit: GIS Points Extractor web application"
 if %errorlevel% neq 0 (
-    echo ❌ Error creating commit
-    pause
-    exit /b 1
-)
-echo ✅ Initial commit created
-
-echo.
-echo [Step 7] Connecting to GitHub...
-git remote add origin https://github.com/%GITHUB_USERNAME%/%REPO_NAME%.git
-if %errorlevel% neq 0 (
-    echo ⚠️ Remote already exists or error occurred
-    echo Removing existing remote and adding new one...
-    git remote remove origin
-    git remote add origin https://github.com/%GITHUB_USERNAME%/%REPO_NAME%.git
-)
-
-echo ✅ Connected to GitHub repository
-echo   Repository: https://github.com/%GITHUB_USERNAME%/%REPO_NAME%
-
-echo.
-echo [Step 8] Setting main branch...
-git branch -M main
-echo ✅ Main branch set
-
-echo.
-echo [Step 9] Pushing to GitHub...
-echo This will upload your code to GitHub...
-echo.
-
-git push -u origin main
-if %errorlevel% neq 0 (
-    echo.
-    echo ❌ Error pushing to GitHub!
-    echo.
-    echo Possible reasons:
-    echo 1. Repository doesn't exist on GitHub
-    echo 2. Authentication required
-    echo 3. Network connection issues
-    echo.
-    echo Solutions:
-    echo 1. Make sure you created the repository on GitHub
-    echo 2. You might need to authenticate with GitHub
-    echo 3. Try running: git push -u origin main manually
-    echo.
+    echo Error: Failed to commit files
     pause
     exit /b 1
 )
 
 echo.
 echo ========================================
-echo           🎉 SUCCESS! 🎉
+echo    Manual Steps Required
 echo ========================================
 echo.
-echo ✅ Your GIS Points Extractor is now on GitHub!
+echo 1. Go to https://github.com and create a new repository
+echo    - Name: gis-points-extractor
+echo    - Description: A modern web application for advanced geospatial analysis
+echo    - Make it Public
+echo    - DO NOT initialize with README (we already have one)
 echo.
-echo 📍 Repository URL: https://github.com/%GITHUB_USERNAME%/%REPO_NAME%
+echo 2. After creating the repository, run these commands:
+echo    git remote add origin https://github.com/YOUR_USERNAME/gis-points-extractor.git
+echo    git branch -M main
+echo    git push -u origin main
 echo.
-echo Next steps:
-echo 1. Visit your repository: https://github.com/%GITHUB_USERNAME%/%REPO_NAME%
-echo 2. Add a description and topics (gis, geospatial, flask, python)
-echo 3. Star your repository for visibility
-echo 4. Share the link with others!
+echo 3. Replace YOUR_USERNAME with your actual GitHub username
+echo.
+echo 4. Update the following files with your information:
+echo    - README.md (replace yourusername with your GitHub username)
+echo    - setup.py (update author and email)
+echo.
+echo 5. Then run: git add . && git commit -m "Update repository info" && git push
 echo.
 echo ========================================
-
+echo    Setup Complete!
+echo ========================================
+echo.
+echo Your repository will be available at:
+echo https://github.com/YOUR_USERNAME/gis-points-extractor
+echo.
 pause
